@@ -6,7 +6,7 @@ import App from './App.jsx'
 const BASENAME = import.meta.env.VITE_BASENAME || "/RED-PRODUCT/";
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <BrowserRouter basename={BASENAME}>
+    <BrowserRouter >
     <App />
     </BrowserRouter>
   </StrictMode>,
