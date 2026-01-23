@@ -1,0 +1,5 @@
+@media (max-width: 768px) {
+  .layout .main {
+    margin-left: 0 !important;
+  }
+}
