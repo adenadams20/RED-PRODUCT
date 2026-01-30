@@ -1,11 +1,10 @@
 import React, { useState } from "react";
-import img from "../assets/img/bg-img.jpeg";
-import api from "../service/api";
 import { useNavigate, Link } from "react-router-dom";
+import img from "../assets/img/bg-img.jpeg";
+import AuthService from "../service/AuthService";
 
 export default function Connexion() {
   const navigate = useNavigate();
-
   const [email, setEmail] = useState("");
   const [motdepasse, setMotdepasse] = useState("");
   const [garderConnecte, setGarderConnecte] = useState(false);
@@ -13,30 +12,19 @@ export default function Connexion() {
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
-  setErreur("");
-
-  try {
+    e.preventDefault();
+    setErreur("");
     setLoading(true);
 
-    const res = await api.post("/login", { email, password: motdepasse });
-    const token = res.data.access_token || res.data.token;
-
-    if (garderConnecte) {
-      localStorage.setItem("token", token);
-    } else {
-      sessionStorage.setItem("token", token);
+    try {
+      await AuthService.login(email, motdepasse, garderConnecte);
+      navigate("/dashboard");
+    } catch (err) {
+      setErreur(err.message || "Email ou mot de passe incorrect");
+    } finally {
+      setLoading(false);
     }
-
-    navigate("/dashboard", { replace: true });
-
-  } catch (err) {
-    const message = err.response?.data?.message || "Email ou mot de passe incorrect";
-    setErreur(message);
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   return (
     <div
@@ -47,19 +35,10 @@ export default function Connexion() {
         backgroundPosition: "center",
       }}
     >
-      <div
-        className="bg-white shadow rounded p-4 px-5 w-100"
-        style={{ maxWidth: 400 }}
-      >
-        <h4 className="text-center fw-bold mb-4">
-          Connexion Admin
-        </h4>
+      <div className="bg-white shadow rounded p-4 px-5 w-100" style={{ maxWidth: 400 }}>
+        <h4 className="text-center fw-bold mb-4">Connexion Admin</h4>
 
-        {erreur && (
-          <div className="alert alert-danger text-center">
-            {erreur}
-          </div>
-        )}
+        {erreur && <div className="alert alert-danger text-center">{erreur}</div>}
 
         <form onSubmit={handleSubmit}>
           <div className="mb-3">
@@ -97,11 +76,7 @@ export default function Connexion() {
             </label>
           </div>
 
-          <button
-            type="submit"
-            className="btn btn-dark w-100"
-            disabled={loading}
-          >
+          <button type="submit" className="btn btn-dark w-100" disabled={loading}>
             {loading ? "Connexion..." : "Se connecter"}
           </button>
         </form>
@@ -112,7 +87,7 @@ export default function Connexion() {
             S'inscrire
           </Link>
         </p>
-        <p className="text-center mt-3 mb-0">
+        <p className="text-center mt-2 mb-0">
           <Link to="/MotDePasseOublie" className="text-warning fw-semibold">
             Mot de passe oublié ?
           </Link>

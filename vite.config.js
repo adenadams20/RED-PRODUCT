@@ -6,7 +6,7 @@ export default defineConfig({
   base: '/',   // ✅ local
 
   server: {
-    port: 5173,      // ✅ port Vite
+    port: 5174,      // ✅ port Vite
     strictPort: true,
 
     proxy: {

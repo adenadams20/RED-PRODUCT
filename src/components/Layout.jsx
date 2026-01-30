@@ -14,7 +14,7 @@ export default function Layout() {
       {/* MAIN */}
       <div
         className="flex-grow-1"
-        style={{ marginLeft: "250px", minHeight: "100vh" }}
+        style={{ marginLeft: "250px", minHeight: "10vh" }}
       >
         {/* NAVBAR */}
         <Navbar toggleSidebar={() => setOpen(!open)} />

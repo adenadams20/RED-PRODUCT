@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import img from "../assets/img/bg-img.jpeg";
-
-const api = import.meta.env.VITE_API_URL || "/api";
+import AuthService from "../service/AuthService"; // Utilisation correcte du service
 
 export default function Inscriptions() {
   const navigate = useNavigate();
@@ -35,39 +34,13 @@ export default function Inscriptions() {
     try {
       setLoading(true);
 
-      const res = await fetch(`${api}/register`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        body: JSON.stringify({
-          name: nom,
-          email: email,
-          password: motdepasse,
-          password_confirmation: motdepasseConfirm,
-        }),
-      });
+      // Appel à AuthService pour l'inscription
+      const data = await AuthService.register(nom, email, motdepasse);
 
-      const data = await res.json();
+      // Stockage du token si succès
+      if (data.token) localStorage.setItem("token", data.token);
 
-      if (!res.ok) {
-        // Gestion des erreurs Laravel pour tous les champs
-        const message =
-          data.message ||
-          (data.errors &&
-            Object.values(data.errors)
-              .flat()
-              .join(" ")) ||
-          "Erreur lors de l'inscription";
-        throw new Error(message);
-      }
-
-      // Stockage token et informations si succès
-      if (data.token) {
-        localStorage.setItem("token", data.token);
-      }
-
+      // Garder connecté
       if (garderConnecte) {
         localStorage.setItem("name", nom);
         localStorage.setItem("email", email);
@@ -81,7 +54,9 @@ export default function Inscriptions() {
       alert("Inscription réussie !");
       navigate("/Connexion");
     } catch (err) {
-      setErreur(err.message);
+      setErreur(
+        err.message || "Erreur lors de l'inscription"
+      );
     } finally {
       setLoading(false);
     }

@@ -1,87 +1,60 @@
+// src/service/AuthService.js
 import api from "./api";
 
 const AuthService = {
-  // ------------------------
-  // REGISTER
-  // ------------------------
   register: async (name, email, password) => {
-    try {
-      const res = await api.post("/register", {
-        name,
-        email,
-        password,
-        password_confirmation: password, // backend Laravel
-      });
-      return res.data;
-    } catch (error) {
-      throw error.response?.data || error;
+    const res = await api.post("/register", {
+      name,
+      email,
+      password,
+      password_confirmation: password,
+    });
+
+    if (res.data.token) {
+      localStorage.setItem("token", res.data.token);
     }
+
+    return res.data;
   },
 
-  // ------------------------
-  // LOGIN
-  // ------------------------
-  login: async (email, password) => {
-    try {
-      const res = await api.post("/login", { email, password });
-      const token = res.data.access_token || res.data.token;
+  login: async (email, password, garderConnecte = true) => {
+    const res = await api.post("/login", {
+      email:email,
+      password:password,
+    });
 
-      if (token) {
+    const token = res.data.token;
+
+    if (token) {
+      if (garderConnecte) {
         localStorage.setItem("token", token);
+      } else {
+        sessionStorage.setItem("token", token);
       }
-      return res.data;
-    } catch (error) {
-      throw error.response?.data || error;
     }
+
+    return res.data;
   },
 
-  // ------------------------
-  // LOGOUT
-  // ------------------------
   logout: async () => {
-    try {
-      await api.post("/logout"); // si backend attend POST /logout
-    } catch (error) {
-      // ignore
-    } finally {
-      localStorage.removeItem("token");
-    }
+    await api.post("/logout");
+    localStorage.removeItem("token");
+    sessionStorage.removeItem("token");
   },
 
-  // ------------------------
-  // GET CURRENT USER
-  // ------------------------
   getMe: async () => {
-    try {
-      const res = await api.get("/me");
-      return res.data;
-    } catch (error) {
-      throw error.response?.data || error;
-    }
+    const res = await api.get("/user");
+    return res.data;
   },
 
-  // ------------------------
-  // FORGOT PASSWORD
-  // ------------------------
   forgotPassword: async (email) => {
-    try {
-      const res = await api.post("/forgot-password", { email });
-      return res.data;
-    } catch (error) {
-      throw error.response?.data || error;
-    }
+    const res = await api.post("/forgot-password", { email });
+    return res.data;
   },
 
-  // ------------------------
-  // RESET PASSWORD
-  // ------------------------
   resetPassword: async (data) => {
-    try {
-      const res = await api.post("/reset-password", data);
-      return res.data;
-    } catch (error) {
-      throw error.response?.data || error;
-    }
+    const res = await api.post("/reset-password", data);
+    return res.data;
   },
 };
 
