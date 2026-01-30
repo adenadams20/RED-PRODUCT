@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import img from "../assets/img/bg-img.jpeg";
-import AuthService from "../service/AuthService"; // Utilisation correcte du service
+import AuthService from "../service/authService"; // Utilisation correcte du service
 
 export default function Inscriptions() {
   const navigate = useNavigate();
