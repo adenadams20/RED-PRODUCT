@@ -17,7 +17,7 @@ export default function MotDePasseOublie() {
     try {
       setLoading(true);
 
-      const res = await api.post("/auth/forgot-password", {
+      const res = await api.post("/forgot-password", {
         email: email,
       });
 
