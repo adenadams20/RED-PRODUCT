@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import HotelService from "../service/HotelService";
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
 
 export default function Hotels() {
   const [hotels, setHotels] = useState([]);
@@ -59,44 +60,46 @@ export default function Hotels() {
     });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const hotelData = {
-      name: form.name || "",
-      address: form.address || "",
-      email: form.email || "",
-      phone: form.phone || "",
-      price: form.price ? Number(form.price) : null,
-      currency: form.currency || "",
-      image: form.image ?? null,
-    };
+ const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    try {
-      setSaving(true);
-      let savedHotel;
+  // Créer FormData pour upload image
+  const formData = new FormData();
+  formData.append("name", form.name || "");
+  formData.append("address", form.address || "");
+  formData.append("email", form.email || "");
+  formData.append("phone", form.phone || "");
+  formData.append("price", form.price ? Number(form.price) : 0);
+  formData.append("currency", form.currency || "XOF");
+  if (form.image) formData.append("image", form.image);
 
-      if (editingHotel) {
-        savedHotel = await HotelService.updateHotel(editingHotel.id, hotelData);
-        setHotels((prev) =>
-          prev.map((h) => (h.id === savedHotel.id ? savedHotel : h))
-        );
-      } else {
-        savedHotel = await HotelService.createHotel(hotelData);
-        setHotels((prev) => [savedHotel, ...prev]);
-      }
+  try {
+    setSaving(true);
+    let savedHotel;
 
-      resetForm();
-    } catch (err) {
-      console.error(err);
-      const msg =
-        err.response?.data
-          ? Object.values(err.response.data).flat().join("\n")
-          : "Erreur inconnue";
-      alert("Erreur lors de l'enregistrement :\n" + msg);
-    } finally {
-      setSaving(false);
+    if (editingHotel) {
+      savedHotel = await HotelService.updateHotel(editingHotel.id, formData);
+      setHotels((prev) =>
+        prev.map((h) => (h.id === savedHotel.id ? savedHotel : h))
+      );
+    } else {
+      savedHotel = await HotelService.createHotel(formData);
+      setHotels((prev) => [savedHotel, ...prev]);
     }
-  };
+
+    resetForm();
+  } catch (err) {
+    console.error(err);
+    const msg =
+      err.response?.data
+        ? Object.values(err.response.data).flat().join("\n")
+        : "Erreur inconnue";
+    alert("Erreur lors de l'enregistrement :\n" + msg);
+  } finally {
+    setSaving(false);
+  }
+};
+
 
   const handleDelete = async (id) => {
     if (!window.confirm("Supprimer cet hôtel ?")) return;
