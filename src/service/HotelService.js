@@ -1,24 +1,32 @@
-import api from "./api"; // axios configuré avec token ou baseURL
-import axios from "axios";
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
+import api from "./api";
+
 const HotelService = {
   async getHotels() {
-    const res = await api.get(`${API_BASE_URL}/hotels`);
+    const res = await api.get("/hotels");
     return res.data;
   },
 
   async createHotel(data) {
     const formData = new FormData();
 
-    Object.entries(data).forEach(([key, value]) => {
-      if (value !== null && value !== "" && key !== "preview") {
-        if (key === "image" && value instanceof File) {
-          formData.append("image", value);
-        } else if (key !== "image") {
-          formData.append(key, value);
-        }
-      }
-    });
+    // Champs requis
+    formData.append("name", data.name || "");
+
+    // Champs optionnels
+    formData.append("address", data.address || "");
+    formData.append("email", data.email || "");
+    formData.append("phone", data.phone || "");
+    formData.append("currency", data.currency || "");
+
+    // Price: doit être null si vide
+    if (data.price !== "" && data.price !== null) {
+      formData.append("price", data.price);
+    }
+
+    // Image
+    if (data.image instanceof File) {
+      formData.append("image", data.image);
+    }
 
     const res = await api.post("/hotels", formData, {
       headers: { "Content-Type": "multipart/form-data" },
@@ -30,17 +38,20 @@ const HotelService = {
   async updateHotel(id, data) {
     const formData = new FormData();
 
-    Object.entries(data).forEach(([key, value]) => {
-      if (value !== null && value !== "" && key !== "preview") {
-        if (key === "image" && value instanceof File) {
-          formData.append("image", value);
-        } else if (key !== "image") {
-          formData.append(key, value);
-        }
-      }
-    });
+    formData.append("name", data.name || "");
+    formData.append("address", data.address || "");
+    formData.append("email", data.email || "");
+    formData.append("phone", data.phone || "");
+    formData.append("currency", data.currency || "");
 
-    // Laravel: PUT via POST + _method
+    if (data.price !== "" && data.price !== null) {
+      formData.append("price", data.price);
+    }
+
+    if (data.image instanceof File) {
+      formData.append("image", data.image);
+    }
+
     const res = await api.post(`/hotels/${id}?_method=PUT`, formData, {
       headers: { "Content-Type": "multipart/form-data" },
     });
