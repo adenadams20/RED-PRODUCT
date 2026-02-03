@@ -2,7 +2,7 @@ import api from "./api";
 
 const HotelService = {
   async getHotels() {
-    const res = await api.get("/hotels");
+    const res = await api.get("/api/hotels");
     return res.data; // Laravel renvoie le tableau d'hôtels
   },
 
@@ -16,7 +16,7 @@ const HotelService = {
     if (data.price !== "" && data.price !== null) formData.append("price", data.price);
     if (data.image instanceof File) formData.append("image", data.image);
 
-    const res = await api.post("/hotels", formData, {
+    const res = await api.post("/api/hotels", formData, {
       headers: { "Content-Type": "multipart/form-data" },
     });
 
@@ -36,7 +36,7 @@ const HotelService = {
     // Laravel nécessite _method=PUT pour les updates via POST
     formData.append("_method", "PUT");
 
-    const res = await api.post(`/hotels/${id}`, formData, {
+    const res = await api.post(`/api/hotels/${id}`, formData, {
       headers: { "Content-Type": "multipart/form-data" },
     });
 
@@ -44,7 +44,7 @@ const HotelService = {
   },
 
   async deleteHotel(id) {
-    await api.delete(`/hotels/${id}`);
+    await api.delete(`/api/hotels/${id}`);
   },
 };
 
