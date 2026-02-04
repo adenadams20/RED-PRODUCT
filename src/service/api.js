@@ -1,10 +1,11 @@
-// api.js
 import axios from "axios";
+
 const api = axios.create({
-  baseURL: `${import.meta.env.VITE_API_URL}/api`,
+  baseURL: import.meta.env.VITE_API_URL,
   headers: {
     Accept: "application/json",
   },
+  withCredentials: true, // ⚠️ nécessaire pour cookies
 });
 
 api.interceptors.request.use((config) => {
